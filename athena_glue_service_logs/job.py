@@ -118,6 +118,13 @@ class JobRunner(object):
             # Note that if the source table is partitionless, this is a null-op.
             self.optimized_catalog.initialize_with_partitions(self.raw_catalog.partitioner.build_partitions_from_s3())
 
+    def raw_create_tables_if_needed(self):
+        """If this is the initial run of the Job, create both the raw and optmized tables in the Data Catalog"""
+        if self.initial_run is True:
+            # TODO: Fail if the table already exists, or for converted tables if the S3 path already exists
+            LOGGER.info("Initial run, scanning S3 for partitions.")
+            self.raw_catalog.initialize_table_from_s3()
+
     def add_new_raw_partitions(self):
         """For the raw catalog, check and see if any new partitions exist for UTC today.
 
